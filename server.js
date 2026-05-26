@@ -1,11 +1,14 @@
 // ================================
-//  E-Audit System Backend Server
-//  Node.js + Express + MySQL
-//  Production Ready for Render
+// E-Audit System Backend Server
+// Node.js + Express + MySQL + AI + Blockchain
 // ================================
 
+// Import Packages
 const express = require("express");
 const cors = require("cors");
+
+// Import Blockchain
+const { myBlockchain } = require("./ai-service/blockchain");
 
 // Import Routes
 const transactionRoutes = require("./routes/transactions");
@@ -18,56 +21,45 @@ const app = express();
 // ================================
 // Middleware
 // ================================
-
-// Allow all origins (you can restrict later)
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
+app.use(cors());
 app.use(express.json());
 
 // ================================
-// Health Check Route
+// Test Route (Homepage)
 // ================================
-
 app.get("/", (req, res) => {
-  res.status(200).send("✅ E-Audit Backend is Running on Render!");
+  res.send("✅ E-Audit Backend is Running Successfully!");
+});
+
+// ================================
+// 🔗 Blockchain Route
+// ================================
+app.get("/blockchain", (req, res) => {
+  res.json(myBlockchain.getChain());
 });
 
 // ================================
 // API Routes
 // ================================
-
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/fraud", fraudRoutes);
 app.use("/api/reports", reportRoutes);
 
 // ================================
-// Handle Unknown Routes
-// ================================
-
-app.use((req, res) => {
-  res.status(404).json({ message: "Route Not Found" });
-});
-
-// ================================
 // Global Error Handler
 // ================================
-
 app.use((err, req, res, next) => {
-  console.error("❌ Server Error:", err);
-  res.status(500).json({ message: "Internal Server Error" });
+  console.error("Global Error:", err.stack);
+  res.status(500).send("Something broke!");
 });
 
 // ================================
-// Start Server (Render Compatible)
+// Start Server
 // ================================
+const PORT = 3000;
 
-// VERY IMPORTANT FOR RENDER
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("🚀 Server Running at:");
+  console.log(`👉 http://localhost:${PORT}`);
+  console.log(`👉 http://192.168.1.6:${PORT}`);
 });
